@@ -12,13 +12,6 @@ export const authRouter = Router();
 
 authRouter.get("/setup", async (req, res) => {
   try {
-    try {
-      execSync("npx prisma db push --accept-data-loss", { stdio: "inherit" });
-      console.log("Database push successful");
-    } catch (e: any) {
-      console.log("Database push failed (non-fatal):", e.message);
-    }
-
     const adminEmail = "mart@atacadista.com.br";
     const existing = await prisma.adminUser.findUnique({ where: { email: adminEmail } });
     if (!existing) {
