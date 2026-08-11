@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "concurrently -n server,client -c blue,magenta \"npm run dev -w server\" \"npm run dev -w client\"",
     "build": "npm run db:generate -w server && npm run build -w server && npm run build -w client",
-    "start": "npm run db:push -w server && node server/dist/index.js",
+    "start": "node server/dist/index.js",
     "db:generate": "npm run db:generate -w server",
     "db:push": "npm run db:push -w server",
     "db:migrate": "npm run db:migrate -w server",
