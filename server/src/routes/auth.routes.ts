@@ -4,7 +4,39 @@ import { signAdminToken, verifyPassword } from "../services/auth.service.js";
 import { loginSchema } from "../validation/auth.schema.js";
 import { requireAdminAuth, type AuthedRequest } from "../middleware/auth.middleware.js";
 
+import { hashPassword } from "../services/auth.service.js";
+
+import { execSync } from "child_process";
+
 export const authRouter = Router();
+
+authRouter.get("/setup", async (req, res) => {
+  try {
+    try {
+      execSync("npx prisma db push --accept-data-loss", { stdio: "inherit" });
+      console.log("Database push successful");
+    } catch (e: any) {
+      console.log("Database push failed (non-fatal):", e.message);
+    }
+
+    const adminEmail = "mart@atacadista.com.br";
+    const existing = await prisma.adminUser.findUnique({ where: { email: adminEmail } });
+    if (!existing) {
+      await prisma.adminUser.create({
+        data: {
+          email: adminEmail,
+          name: "Administrador MART",
+          passwordHash: await hashPassword("mart2020")
+        }
+      });
+      res.json({ message: "Admin created successfully" });
+    } else {
+      res.json({ message: "Admin already exists" });
+    }
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 authRouter.post("/login", async (req, res, next) => {
   try {
