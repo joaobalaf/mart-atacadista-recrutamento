@@ -44,77 +44,34 @@ publicRouter.post("/candidates", candidateSubmitLimiter, async (req, res, next) 
   try {
     const input = createCandidateSchema.parse(req.body);
 
-    const duplicate = await findPossibleDuplicate(input.cpf, input.phone);
+    const duplicate = await findPossibleDuplicate(input.phone);
 
     const geocode = await geocodeAddress({
       street: `${input.street}${input.number ? ", " + input.number : ""}`,
-      neighborhood: input.neighborhood,
       city: input.city,
       state: input.state,
       cep: input.cep,
     });
 
-    const preferredStore = input.preferredStoreChoice
-      ? await prisma.store.findFirst({
-          where: {
-            city: {
-              equals:
-                input.preferredStoreChoice === "CAJAMAR"
-                  ? "Cajamar"
-                  : input.preferredStoreChoice === "ITAPEVI"
-                    ? "Itapevi"
-                    : input.preferredStoreChoice === "BARUERI"
-                      ? "Barueri"
-                      : undefined,
-            },
-          },
-        })
-      : null;
-
     const candidate = await prisma.candidate.create({
       data: {
         fullName: input.fullName,
-        cpf: input.cpf,
-        birthDate: input.birthDate,
         phone: input.phone,
-        email: input.email || null,
-        gender: input.gender,
         city: input.city,
         state: input.state.toUpperCase(),
         cep: input.cep,
         street: input.street,
         number: input.number,
-        complement: input.complement,
-        neighborhood: input.neighborhood,
         lat: geocode?.lat ?? null,
         lng: geocode?.lng ?? null,
         geocodeStatus: geocode ? "OK" : "FAILED",
         otherJobInterest: input.otherJobInterest,
-        hasPreviousExperience: input.hasPreviousExperience,
-        availableMorning: input.availableMorning,
-        availableAfternoon: input.availableAfternoon,
-        availableNight: input.availableNight,
-        availableAnytime: input.availableAnytime,
-        weekendAvailability: input.weekendAvailability ?? undefined,
-        availableScale6x1: input.availableScale6x1,
-        transportMode: input.transportMode ?? undefined,
-        transportModeOther: input.transportModeOther,
-        hasPublicTransportAccess: input.hasPublicTransportAccess,
-        preferredStoreChoice: input.preferredStoreChoice ?? undefined,
-        preferredStoreId: preferredStore?.id,
+        lastExperience: input.lastExperience,
+        aboutYou: input.aboutYou,
         termsAcceptedAt: new Date(),
         possibleDuplicateOfId: duplicate?.id,
         jobs: {
           create: input.jobIds.map((jobId) => ({ job: { connect: { id: jobId } } })),
-        },
-        experiences: {
-          create: input.experiences.map((exp) => ({
-            company: exp.company,
-            role: exp.role,
-            startDate: exp.startDate,
-            endDate: exp.endDate,
-            activities: exp.activities,
-          })),
         },
         statusHistory: {
           create: { status: "NOVO" },

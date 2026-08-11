@@ -12,18 +12,17 @@ import {
   validateStep3,
   validateStep4,
   validateStep5,
-  validateStep6,
   type Errors,
 } from "../../lib/validation";
 import { Step1PersonalData } from "./steps/Step1PersonalData";
 import { Step2Address } from "./steps/Step2Address";
 import { Step3Jobs } from "./steps/Step3Jobs";
 import { Step4Experience } from "./steps/Step4Experience";
-import { Step5Availability } from "./steps/Step5Availability";
-import { Step6Review } from "./steps/Step6Review";
+import { Step5About } from "./steps/Step5About";
 import { api, ApiError } from "../../services/api";
 
-const VALIDATORS = [validateStep1, validateStep2, validateStep3, validateStep4, validateStep5, validateStep6];
+const VALIDATORS = [validateStep1, validateStep2, validateStep3, validateStep4, validateStep5];
+const TOTAL_STEPS = VALIDATORS.length;
 
 export function Wizard() {
   const persisted = loadWizardState();
@@ -53,7 +52,7 @@ export function Wizard() {
     setErrors(stepErrors);
     if (Object.keys(stepErrors).length > 0) return;
 
-    if (step < 6) {
+    if (step < TOTAL_STEPS) {
       setStep(step + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
@@ -74,32 +73,16 @@ export function Wizard() {
     try {
       await api.post("/public/candidates", {
         fullName: data.fullName,
-        cpf: data.cpf,
-        birthDate: data.birthDate,
         phone: data.phone,
-        email: data.email || undefined,
-        gender: data.gender || undefined,
         city: data.city,
         state: data.state,
         cep: data.cep || undefined,
         street: data.street,
         number: data.number || undefined,
-        complement: data.complement || undefined,
-        neighborhood: data.neighborhood || undefined,
-        jobIds: data.jobIds,
+        jobIds: data.jobId ? [data.jobId] : [],
         otherJobInterest: data.wantsOtherOpportunity ? data.otherJobInterest : undefined,
-        hasPreviousExperience: data.hasPreviousExperience,
-        experiences: data.experiences,
-        availableMorning: data.availableMorning,
-        availableAfternoon: data.availableAfternoon,
-        availableNight: data.availableNight,
-        availableAnytime: data.availableAnytime,
-        weekendAvailability: data.weekendAvailability || undefined,
-        availableScale6x1: data.availableScale6x1,
-        transportMode: data.transportMode || undefined,
-        transportModeOther: data.transportModeOther || undefined,
-        hasPublicTransportAccess: data.hasPublicTransportAccess,
-        preferredStoreChoice: data.preferredStoreChoice || undefined,
+        lastExperience: data.lastExperience || undefined,
+        aboutYou: data.aboutYou || undefined,
         termsAccepted: data.termsAccepted,
       });
       clearWizardState();
@@ -137,8 +120,7 @@ export function Wizard() {
                 {step === 2 && <Step2Address errors={errors} />}
                 {step === 3 && <Step3Jobs errors={errors} />}
                 {step === 4 && <Step4Experience errors={errors} />}
-                {step === 5 && <Step5Availability errors={errors} />}
-                {step === 6 && <Step6Review errors={errors} />}
+                {step === 5 && <Step5About errors={errors} />}
 
                 {submitError && (
                   <p className="mt-4 rounded-lg bg-brand-red-50 px-3 py-2 text-sm font-medium text-brand-red-700">
@@ -151,7 +133,7 @@ export function Wizard() {
                     Voltar
                   </Button>
                   <Button type="button" onClick={goNext} disabled={submitting}>
-                    {step === 6 ? (submitting ? "Enviando..." : "Enviar cadastro") : "Continuar"}
+                    {step === TOTAL_STEPS ? (submitting ? "Enviando..." : "Concluir") : "Continuar"}
                   </Button>
                 </div>
               </div>

@@ -1,27 +1,12 @@
 import { z } from "zod";
 
-const experienceSchema = z.object({
-  company: z.string().min(1, "Informe a empresa."),
-  role: z.string().min(1, "Informe o cargo/função."),
-  startDate: z.string().min(1, "Informe o período de entrada."),
-  endDate: z.string().optional().nullable(),
-  activities: z.string().optional().nullable(),
-});
-
 export const createCandidateSchema = z.object({
-  // Dados pessoais
+  // Dados básicos
   fullName: z.string().min(3, "Informe o nome completo."),
-  cpf: z
-    .string()
-    .transform((v) => v.replace(/\D/g, ""))
-    .refine((v) => v.length === 11, "CPF inválido."),
-  birthDate: z.coerce.date({ errorMap: () => ({ message: "Data de nascimento inválida." }) }),
   phone: z
     .string()
     .transform((v) => v.replace(/\D/g, ""))
     .refine((v) => v.length >= 10 && v.length <= 11, "Telefone inválido."),
-  email: z.string().email("E-mail inválido.").optional().or(z.literal("")).nullable(),
-  gender: z.string().optional().nullable(),
 
   // Endereço
   city: z.string().min(1, "Informe a cidade."),
@@ -29,35 +14,14 @@ export const createCandidateSchema = z.object({
   cep: z.string().optional().nullable(),
   street: z.string().min(1, "Informe o endereço."),
   number: z.string().optional().nullable(),
-  complement: z.string().optional().nullable(),
-  neighborhood: z.string().optional().nullable(),
 
-  // Vagas
+  // Vaga
   jobIds: z.array(z.string()).default([]),
   otherJobInterest: z.string().optional().nullable(),
 
-  // Experiência
-  hasPreviousExperience: z.boolean().default(false),
-  experiences: z.array(experienceSchema).default([]),
-
-  // Disponibilidade
-  availableMorning: z.boolean().default(false),
-  availableAfternoon: z.boolean().default(false),
-  availableNight: z.boolean().default(false),
-  availableAnytime: z.boolean().default(false),
-  weekendAvailability: z.enum(["SIM", "NAO", "DEPENDENDO_DA_ESCALA"]).optional().nullable(),
-  availableScale6x1: z.boolean().optional().nullable(),
-
-  // Transporte
-  transportMode: z
-    .enum(["TRANSPORTE_PUBLICO", "CARRO", "MOTO", "BICICLETA", "A_PE", "OUTRO"])
-    .optional()
-    .nullable(),
-  transportModeOther: z.string().optional().nullable(),
-  hasPublicTransportAccess: z.boolean().optional().nullable(),
-
-  // Loja preferida
-  preferredStoreChoice: z.enum(["CAJAMAR", "ITAPEVI", "BARUERI", "QUALQUER_UMA"]).optional().nullable(),
+  // Experiência e perfil (texto livre)
+  lastExperience: z.string().optional().nullable(),
+  aboutYou: z.string().optional().nullable(),
 
   // LGPD
   termsAccepted: z.literal(true, {

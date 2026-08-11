@@ -1,13 +1,6 @@
 import { Logo } from "./Logo";
 
-const STEPS = [
-  "Dados pessoais",
-  "Endereço",
-  "Vaga de interesse",
-  "Experiência profissional",
-  "Disponibilidade",
-  "Revisão e envio",
-];
+const STEPS = ["Seus dados", "Endereço", "Vaga de interesse", "Sua experiência", "Sobre você"];
 
 const HIGHLIGHTS = [
   "Vagas em Cajamar, Itapevi e Barueri",

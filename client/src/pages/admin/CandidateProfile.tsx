@@ -14,15 +14,6 @@ interface Distance {
   store: { id: string; name: string; city: string };
 }
 
-interface Experience {
-  id: string;
-  company: string;
-  role: string;
-  startDate: string;
-  endDate: string | null;
-  activities: string | null;
-}
-
 interface Note {
   id: string;
   text: string;
@@ -33,61 +24,23 @@ interface Note {
 interface CandidateDetail {
   id: string;
   fullName: string;
-  cpf: string;
-  birthDate: string;
   phone: string;
-  email: string | null;
-  gender: string | null;
   city: string;
   state: string;
   cep: string | null;
   street: string;
   number: string | null;
-  complement: string | null;
-  neighborhood: string | null;
   otherJobInterest: string | null;
-  hasPreviousExperience: boolean;
-  availableMorning: boolean;
-  availableAfternoon: boolean;
-  availableNight: boolean;
-  availableAnytime: boolean;
-  weekendAvailability: string | null;
-  availableScale6x1: boolean | null;
-  transportMode: string | null;
-  transportModeOther: string | null;
-  hasPublicTransportAccess: boolean | null;
-  preferredStoreChoice: string | null;
+  lastExperience: string | null;
+  aboutYou: string | null;
   status: CandidateStatus;
   createdAt: string;
   geocodeStatus: string;
   jobs: { job: { id: string; name: string } }[];
   distances: Distance[];
-  experiences: Experience[];
   notes: Note[];
   duplicate: { id: string; fullName: string; phone: string; createdAt: string } | null;
 }
-
-const TRANSPORT_LABELS: Record<string, string> = {
-  TRANSPORTE_PUBLICO: "Transporte público",
-  CARRO: "Carro",
-  MOTO: "Moto",
-  BICICLETA: "Bicicleta",
-  A_PE: "A pé",
-  OUTRO: "Outro",
-};
-
-const WEEKEND_LABELS: Record<string, string> = {
-  SIM: "Sim",
-  NAO: "Não",
-  DEPENDENDO_DA_ESCALA: "Dependendo da escala",
-};
-
-const STORE_CHOICE_LABELS: Record<string, string> = {
-  CAJAMAR: "Cajamar",
-  ITAPEVI: "Itapevi",
-  BARUERI: "Barueri",
-  QUALQUER_UMA: "Qualquer uma das lojas",
-};
 
 function InfoRow({ label, value }: { label: string; value?: string | null }) {
   return (
@@ -191,28 +144,19 @@ export function CandidateProfile() {
 
       <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Card>
-          <CardTitle>Dados pessoais</CardTitle>
-          <InfoRow label="CPF" value={candidate.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")} />
-          <InfoRow label="Nascimento" value={new Date(candidate.birthDate).toLocaleDateString("pt-BR")} />
-          <InfoRow label="Sexo" value={candidate.gender} />
-        </Card>
-
-        <Card>
           <CardTitle>Contato</CardTitle>
           <InfoRow label="Telefone" value={candidate.phone} />
-          <InfoRow label="E-mail" value={candidate.email} />
         </Card>
 
         <Card>
           <CardTitle>Endereço</CardTitle>
           <InfoRow label="Endereço" value={`${candidate.street}${candidate.number ? ", " + candidate.number : ""}`} />
-          <InfoRow label="Bairro" value={candidate.neighborhood} />
           <InfoRow label="Cidade" value={`${candidate.city}/${candidate.state}`} />
           <InfoRow label="CEP" value={candidate.cep} />
         </Card>
 
         <Card>
-          <CardTitle>Vagas de interesse</CardTitle>
+          <CardTitle>Vaga de interesse</CardTitle>
           <p className="text-sm text-brand-ink">
             {candidate.jobs.map((j) => j.job.name).join(", ") || "—"}
           </p>
@@ -221,28 +165,6 @@ export function CandidateProfile() {
               Outra oportunidade: {candidate.otherJobInterest}
             </p>
           )}
-        </Card>
-
-        <Card>
-          <CardTitle>Disponibilidade</CardTitle>
-          <InfoRow
-            label="Períodos"
-            value={
-              [
-                candidate.availableMorning && "Manhã",
-                candidate.availableAfternoon && "Tarde",
-                candidate.availableNight && "Noite",
-                candidate.availableAnytime && "Qualquer horário",
-              ]
-                .filter(Boolean)
-                .join(", ") || "—"
-            }
-          />
-          <InfoRow label="Finais de semana" value={candidate.weekendAvailability ? WEEKEND_LABELS[candidate.weekendAvailability] : null} />
-          <InfoRow label="Escala 6x1" value={candidate.availableScale6x1 == null ? null : candidate.availableScale6x1 ? "Sim" : "Não"} />
-          <InfoRow label="Transporte" value={candidate.transportMode ? TRANSPORT_LABELS[candidate.transportMode] : null} />
-          <InfoRow label="Acesso a transporte público" value={candidate.hasPublicTransportAccess == null ? null : candidate.hasPublicTransportAccess ? "Sim" : "Não"} />
-          <InfoRow label="Preferência de loja" value={candidate.preferredStoreChoice ? STORE_CHOICE_LABELS[candidate.preferredStoreChoice] : null} />
         </Card>
 
         <Card>
@@ -265,26 +187,28 @@ export function CandidateProfile() {
                 <span>{d.distanceKm.toFixed(1)} km</span>
               </div>
             ))}
+            {sortedDistances.length === 0 && (
+              <p className="text-sm text-brand-gray-500">Endereço ainda não geocodificado.</p>
+            )}
           </div>
         </Card>
       </div>
 
-      {candidate.hasPreviousExperience && candidate.experiences.length > 0 && (
-        <Card className="mt-5">
-          <CardTitle>Experiência profissional</CardTitle>
-          <div className="space-y-4">
-            {candidate.experiences.map((exp) => (
-              <div key={exp.id} className="rounded-xl border border-brand-gray-100 p-3">
-                <p className="text-sm font-semibold text-brand-ink">{exp.role} — {exp.company}</p>
-                <p className="text-xs text-brand-gray-500">
-                  {exp.startDate} até {exp.endDate || "atual"}
-                </p>
-                {exp.activities && <p className="mt-1 text-sm text-brand-gray-600">{exp.activities}</p>}
-              </div>
-            ))}
-          </div>
+      <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <Card>
+          <CardTitle>Última experiência de trabalho</CardTitle>
+          <p className="whitespace-pre-wrap text-sm text-brand-ink">
+            {candidate.lastExperience || "—"}
+          </p>
         </Card>
-      )}
+
+        <Card>
+          <CardTitle>Sobre o candidato</CardTitle>
+          <p className="whitespace-pre-wrap text-sm text-brand-ink">
+            {candidate.aboutYou || "—"}
+          </p>
+        </Card>
+      </div>
 
       <Card className="mt-5">
         <CardTitle>Observações internas</CardTitle>

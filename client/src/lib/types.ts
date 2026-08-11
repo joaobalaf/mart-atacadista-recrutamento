@@ -10,88 +10,42 @@ export interface StoreSummary {
   city: string;
 }
 
-export interface ExperienceForm {
-  company: string;
-  role: string;
-  startDate: string;
-  endDate?: string;
-  activities?: string;
-}
-
 export interface CandidateFormData {
   fullName: string;
-  cpf: string;
-  birthDate: string;
   phone: string;
-  email: string;
-  gender: string;
 
   cep: string;
   city: string;
   state: string;
   street: string;
   number: string;
-  complement: string;
-  neighborhood: string;
 
-  jobIds: string[];
+  jobId: string;
   wantsOtherOpportunity: boolean;
   otherJobInterest: string;
 
-  hasPreviousExperience: boolean;
-  experiences: ExperienceForm[];
-
-  availableMorning: boolean;
-  availableAfternoon: boolean;
-  availableNight: boolean;
-  availableAnytime: boolean;
-  weekendAvailability: "SIM" | "NAO" | "DEPENDENDO_DA_ESCALA" | "";
-  availableScale6x1: boolean | null;
-
-  transportMode: "TRANSPORTE_PUBLICO" | "CARRO" | "MOTO" | "BICICLETA" | "A_PE" | "OUTRO" | "";
-  transportModeOther: string;
-  hasPublicTransportAccess: boolean | null;
-
-  preferredStoreChoice: "CAJAMAR" | "ITAPEVI" | "BARUERI" | "QUALQUER_UMA" | "";
+  lastExperience: string;
+  aboutYou: string;
 
   termsAccepted: boolean;
 }
 
 export const emptyCandidateForm: CandidateFormData = {
   fullName: "",
-  cpf: "",
-  birthDate: "",
   phone: "",
-  email: "",
-  gender: "",
 
   cep: "",
   city: "",
   state: "",
   street: "",
   number: "",
-  complement: "",
-  neighborhood: "",
 
-  jobIds: [],
+  jobId: "",
   wantsOtherOpportunity: false,
   otherJobInterest: "",
 
-  hasPreviousExperience: false,
-  experiences: [],
-
-  availableMorning: false,
-  availableAfternoon: false,
-  availableNight: false,
-  availableAnytime: false,
-  weekendAvailability: "",
-  availableScale6x1: null,
-
-  transportMode: "",
-  transportModeOther: "",
-  hasPublicTransportAccess: null,
-
-  preferredStoreChoice: "",
+  lastExperience: "",
+  aboutYou: "",
 
   termsAccepted: false,
 };

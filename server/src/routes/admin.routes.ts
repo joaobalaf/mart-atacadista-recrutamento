@@ -9,7 +9,6 @@ adminRouter.use(requireAdminAuth);
 const candidateListInclude = {
   jobs: { include: { job: true } },
   distances: { include: { store: true } },
-  preferredStore: true,
 } as const;
 
 function toListItem(candidate: Awaited<ReturnType<typeof fetchAll>>[number]) {
@@ -47,8 +46,7 @@ adminRouter.get("/candidates", async (req, res, next) => {
         (c) =>
           c.fullName.toLowerCase().includes(term) ||
           c.phone.includes(term) ||
-          c.city.toLowerCase().includes(term) ||
-          c.cpf.includes(term)
+          c.city.toLowerCase().includes(term)
       );
     }
 
@@ -97,8 +95,6 @@ adminRouter.get("/candidates/:id", async (req, res, next) => {
       include: {
         jobs: { include: { job: true } },
         distances: { include: { store: true }, orderBy: { distanceKm: "asc" } },
-        experiences: true,
-        preferredStore: true,
         notes: { include: { author: true }, orderBy: { createdAt: "desc" } },
         statusHistory: { include: { changedBy: true }, orderBy: { changedAt: "desc" } },
       },

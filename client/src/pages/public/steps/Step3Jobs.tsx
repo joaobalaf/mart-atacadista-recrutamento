@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useWizard } from "../../../store/wizardStore";
-import { Checkbox, ErrorText, Label, Textarea } from "../../../components/ui";
+import { ErrorText, Label, Select, Textarea } from "../../../components/ui";
 import { api } from "../../../services/api";
 import type { Job } from "../../../lib/types";
 import type { Errors } from "../../../lib/validation";
+
+const OTHER_VALUE = "__OUTRA__";
 
 export function Step3Jobs({ errors }: { errors: Errors }) {
   const { data, updateData } = useWizard();
@@ -13,33 +15,35 @@ export function Step3Jobs({ errors }: { errors: Errors }) {
     api.get<Job[]>("/public/jobs").then(setJobs).catch(() => setJobs([]));
   }, []);
 
-  function toggleJob(jobId: string, checked: boolean) {
-    updateData({
-      jobIds: checked ? [...data.jobIds, jobId] : data.jobIds.filter((id) => id !== jobId),
-    });
+  function handleChange(value: string) {
+    if (value === OTHER_VALUE) {
+      updateData({ jobId: "", wantsOtherOpportunity: true });
+    } else {
+      updateData({ jobId: value, wantsOtherOpportunity: false, otherJobInterest: "" });
+    }
   }
 
   return (
     <div className="space-y-5">
       <h2 className="text-lg font-bold text-brand-ink">Qual vaga você tem interesse?</h2>
-      <p className="text-sm text-brand-gray-500">Você pode selecionar mais de uma opção.</p>
+      <p className="text-sm text-brand-gray-500">Escolha a opção que mais combina com você.</p>
 
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-        {jobs.map((job) => (
-          <Checkbox
-            key={job.id}
-            label={job.name}
-            checked={data.jobIds.includes(job.id)}
-            onChange={(checked) => toggleJob(job.id, checked)}
-          />
-        ))}
+      <div>
+        <Label>Vaga de interesse *</Label>
+        <Select
+          value={data.wantsOtherOpportunity ? OTHER_VALUE : data.jobId}
+          onChange={(e) => handleChange(e.target.value)}
+        >
+          <option value="">Selecione uma vaga</option>
+          {jobs.map((job) => (
+            <option key={job.id} value={job.id}>
+              {job.name}
+            </option>
+          ))}
+          <option value={OTHER_VALUE}>Outras oportunidades</option>
+        </Select>
+        <ErrorText>{errors.jobId}</ErrorText>
       </div>
-
-      <Checkbox
-        label="Tenho interesse em outras oportunidades"
-        checked={data.wantsOtherOpportunity}
-        onChange={(checked) => updateData({ wantsOtherOpportunity: checked })}
-      />
 
       {data.wantsOtherOpportunity && (
         <div>
@@ -52,8 +56,6 @@ export function Step3Jobs({ errors }: { errors: Errors }) {
           <ErrorText>{errors.otherJobInterest}</ErrorText>
         </div>
       )}
-
-      <ErrorText>{errors.jobIds}</ErrorText>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-const STEP_LABELS = ["Dados", "Endereço", "Vaga", "Experiência", "Disponibilidade", "Revisão"];
+const STEP_LABELS = ["Dados", "Endereço", "Vaga", "Experiência", "Sobre você"];
 
 export function ProgressBar({ step }: { step: number }) {
   return (
