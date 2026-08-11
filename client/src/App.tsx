@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./components/AuthProvider";
 import { RequireAdmin } from "./components/RequireAdmin";
-import { Landing } from "./pages/public/Landing";
+
 import { Wizard } from "./pages/public/Wizard";
 import { Success } from "./pages/public/Success";
 import { Login } from "./pages/admin/Login";
@@ -16,8 +16,7 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/cadastro" element={<Wizard />} />
+          <Route path="/" element={<Wizard />} />
           <Route path="/cadastro/sucesso" element={<Success />} />
 
           <Route path="/admin/login" element={<Login />} />
