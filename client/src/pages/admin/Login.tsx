@@ -44,7 +44,7 @@ export function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label>E-mail</Label>
+            <Label>Usuário</Label>
             <Input type="text" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus placeholder="Usuário ou E-mail" />
           </div>
           <div>
