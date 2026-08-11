@@ -1,13 +1,23 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { AdminLayout } from "../../layouts/AdminLayout";
 import { Card } from "../../components/ui";
+import { StoreBadge } from "../../components/StoreBadge";
 import { api } from "../../services/api";
 import { STATUS_LABELS, type CandidateStatus } from "../../lib/types";
+
+interface StoreCount {
+  id: string;
+  name: string;
+  city: string;
+  count: number;
+}
 
 interface Stats {
   total: number;
   today: number;
   byStatus: Partial<Record<CandidateStatus, number>>;
+  byStore: StoreCount[];
 }
 
 export function Dashboard() {
@@ -51,6 +61,37 @@ export function Dashboard() {
           </p>
         </Card>
       </div>
+
+      <div className="mt-10 flex items-center justify-between">
+        <h2 className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
+          Melhor loja por candidato
+        </h2>
+        <Link to="/admin/candidatos" className="text-xs font-semibold text-brand-red-600 hover:underline">
+          Ver candidatos →
+        </Link>
+      </div>
+      <Card className="mt-4 border-slate-200/80 shadow-xs">
+        <div className="space-y-4">
+          {(() => {
+            const maxCount = Math.max(1, ...(stats?.byStore.map((s) => s.count) ?? [1]));
+            return stats?.byStore.map((s) => (
+              <div key={s.id}>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <StoreBadge name={s.name} />
+                  <span className="text-sm font-bold text-slate-900">{s.count}</span>
+                </div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full bg-brand-red-500"
+                    style={{ width: `${(s.count / maxCount) * 100}%` }}
+                  />
+                </div>
+              </div>
+            ));
+          })()}
+          {!stats && <p className="text-sm text-slate-500">Carregando...</p>}
+        </div>
+      </Card>
 
       <h2 className="mt-10 text-xs font-extrabold uppercase tracking-wider text-slate-400">Status dos Processos Seletivos</h2>
       <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">

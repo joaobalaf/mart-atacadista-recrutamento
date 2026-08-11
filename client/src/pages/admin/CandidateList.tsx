@@ -3,14 +3,23 @@ import { Link } from "react-router-dom";
 import { AdminLayout } from "../../layouts/AdminLayout";
 import { Card, Input, Select } from "../../components/ui";
 import { StatusBadge } from "../../components/StatusBadge";
+import { StoreBadge } from "../../components/StoreBadge";
+import { shortStoreName, storeColor } from "../../lib/storeColors";
 import { api } from "../../services/api";
 import type { CandidateListItem, Job, StoreSummary } from "../../lib/types";
 import { STATUS_LABELS, type CandidateStatus } from "../../lib/types";
+
+interface StoreCount {
+  id: string;
+  name: string;
+  count: number;
+}
 
 export function CandidateList() {
   const [candidates, setCandidates] = useState<CandidateListItem[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [stores, setStores] = useState<StoreSummary[]>([]);
+  const [storeCounts, setStoreCounts] = useState<StoreCount[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [q, setQ] = useState("");
@@ -23,6 +32,10 @@ export function CandidateList() {
   useEffect(() => {
     api.get<Job[]>("/admin/jobs", true).then(setJobs).catch(() => {});
     api.get<StoreSummary[]>("/admin/stores", true).then(setStores).catch(() => {});
+    api
+      .get<{ byStore: StoreCount[] }>("/admin/stats", true)
+      .then((s) => setStoreCounts(s.byStore))
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -54,7 +67,34 @@ export function CandidateList() {
         </div>
       </div>
 
-      <Card className="mt-6 border-slate-200/80 shadow-xs">
+      <div className="mt-5 flex flex-wrap gap-2">
+        <p className="mr-1 self-center text-xs font-semibold uppercase tracking-wide text-brand-gray-500">
+          Melhor loja por candidato:
+        </p>
+        <button
+          type="button"
+          onClick={() => setStoreId("")}
+          className={`rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-inset transition ${
+            storeId === "" ? "bg-brand-ink text-white ring-brand-ink" : "bg-white text-brand-gray-600 ring-brand-gray-300 hover:bg-brand-gray-50"
+          }`}
+        >
+          Todas ({storeCounts.reduce((sum, s) => sum + s.count, 0)})
+        </button>
+        {storeCounts.map((s) => (
+          <button
+            key={s.id}
+            type="button"
+            onClick={() => setStoreId(s.id === storeId ? "" : s.id)}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-inset transition ${
+              storeId === s.id ? "ring-2 ring-offset-1" : "hover:opacity-80"
+            } ${storeColor(s.name)}`}
+          >
+            {shortStoreName(s.name)} ({s.count})
+          </button>
+        ))}
+      </div>
+
+      <Card className="mt-4 border-slate-200/80 shadow-xs">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           <Input placeholder="Nome, telefone, cidade..." value={q} onChange={(e) => setQ(e.target.value)} className="lg:col-span-2" />
           <Select value={jobId} onChange={(e) => setJobId(e.target.value)}>
@@ -96,8 +136,7 @@ export function CandidateList() {
               <th className="px-4 py-3">Telefone</th>
               <th className="px-4 py-3">Cidade</th>
               <th className="px-4 py-3">Vaga(s)</th>
-              <th className="px-4 py-3">Loja mais próxima</th>
-              <th className="px-4 py-3">Distância</th>
+              <th className="px-4 py-3">Melhor loja</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Data</th>
             </tr>
@@ -118,9 +157,12 @@ export function CandidateList() {
                 <td className="px-4 py-3 text-brand-gray-600">{c.phone}</td>
                 <td className="px-4 py-3 text-brand-gray-600">{c.city}/{c.state}</td>
                 <td className="px-4 py-3 text-brand-gray-600">{c.jobs.join(", ") || "—"}</td>
-                <td className="px-4 py-3 text-brand-gray-600">{c.nearestStore?.name.replace("MART Atacadista — ", "") ?? "—"}</td>
-                <td className="px-4 py-3 font-medium text-brand-ink">
-                  {c.nearestStore ? `${c.nearestStore.distanceKm.toFixed(1)} km` : "—"}
+                <td className="px-4 py-3">
+                  {c.nearestStore ? (
+                    <StoreBadge name={c.nearestStore.name} distanceKm={c.nearestStore.distanceKm} />
+                  ) : (
+                    <span className="text-brand-gray-400">—</span>
+                  )}
                 </td>
                 <td className="px-4 py-3"><StatusBadge status={c.status} /></td>
                 <td className="px-4 py-3 text-brand-gray-500">{new Date(c.createdAt).toLocaleDateString("pt-BR")}</td>

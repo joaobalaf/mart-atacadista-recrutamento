@@ -178,7 +178,7 @@ adminRouter.get("/stores", async (_req, res, next) => {
 
 adminRouter.get("/stats", async (_req, res, next) => {
   try {
-    const [total, byStatus, todayCount] = await Promise.all([
+    const [total, byStatus, todayCount, stores, byStoreRaw] = await Promise.all([
       prisma.candidate.count(),
       prisma.candidate.groupBy({ by: ["status"], _count: true }),
       prisma.candidate.count({
@@ -188,12 +188,27 @@ adminRouter.get("/stats", async (_req, res, next) => {
           },
         },
       }),
+      prisma.store.findMany({ orderBy: { name: "asc" } }),
+      prisma.candidateDistance.groupBy({
+        by: ["storeId"],
+        where: { isNearest: true },
+        _count: true,
+      }),
     ]);
+
+    const byStoreCounts = new Map(byStoreRaw.map((s) => [s.storeId, s._count]));
+    const byStore = stores.map((store) => ({
+      id: store.id,
+      name: store.name,
+      city: store.city,
+      count: byStoreCounts.get(store.id) ?? 0,
+    }));
 
     res.json({
       total,
       today: todayCount,
       byStatus: Object.fromEntries(byStatus.map((s) => [s.status, s._count])),
+      byStore,
     });
   } catch (err) {
     next(err);
