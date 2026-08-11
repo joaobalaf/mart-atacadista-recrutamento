@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { PublicLayout } from "../../layouts/PublicLayout";
+import { Link, useNavigate } from "react-router-dom";
 import { ProgressBar } from "../../components/ProgressBar";
+import { WizardSidePanel } from "../../components/WizardSidePanel";
+import { Logo } from "../../components/Logo";
 import { Button } from "../../components/ui";
 import { WizardContext, loadWizardState, saveWizardState, clearWizardState } from "../../store/wizardStore";
 import { emptyCandidateForm, type CandidateFormData } from "../../lib/types";
@@ -112,34 +113,52 @@ export function Wizard() {
 
   return (
     <WizardContext.Provider value={{ data, updateData, step, setStep }}>
-      <PublicLayout>
-        <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
-          <ProgressBar step={step} />
-          <div className="rounded-2xl border border-brand-gray-200 bg-white p-6 shadow-sm sm:p-8">
-            {step === 1 && <Step1PersonalData errors={errors} />}
-            {step === 2 && <Step2Address errors={errors} />}
-            {step === 3 && <Step3Jobs errors={errors} />}
-            {step === 4 && <Step4Experience errors={errors} />}
-            {step === 5 && <Step5Availability errors={errors} />}
-            {step === 6 && <Step6Review errors={errors} />}
+      <div className="grid min-h-screen bg-brand-gray-50 lg:grid-cols-[400px_1fr]">
+        <WizardSidePanel step={step} />
 
-            {submitError && (
-              <p className="mt-4 rounded-lg bg-brand-red-50 px-3 py-2 text-sm font-medium text-brand-red-700">
-                {submitError}
-              </p>
-            )}
+        <div className="flex flex-col">
+          <div className="border-b border-brand-gray-200 bg-white px-4 py-4 sm:px-6 lg:hidden">
+            <Link to="/">
+              <Logo variant="dark" />
+            </Link>
+          </div>
 
-            <div className="mt-8 flex items-center justify-between">
-              <Button type="button" variant="secondary" onClick={goBack} disabled={step === 1 || submitting}>
-                Voltar
-              </Button>
-              <Button type="button" onClick={goNext} disabled={submitting}>
-                {step === 6 ? (submitting ? "Enviando..." : "Enviar cadastro") : "Continuar"}
-              </Button>
+          <div className="flex flex-1 items-start justify-center px-4 py-8 sm:px-6 sm:py-12">
+            <div className="w-full max-w-xl">
+              <div className="mb-8 lg:hidden">
+                <ProgressBar step={step} />
+              </div>
+
+              <div
+                key={step}
+                className="animate-step-in rounded-2xl border border-brand-gray-200 bg-white p-6 shadow-sm sm:p-8"
+              >
+                {step === 1 && <Step1PersonalData errors={errors} />}
+                {step === 2 && <Step2Address errors={errors} />}
+                {step === 3 && <Step3Jobs errors={errors} />}
+                {step === 4 && <Step4Experience errors={errors} />}
+                {step === 5 && <Step5Availability errors={errors} />}
+                {step === 6 && <Step6Review errors={errors} />}
+
+                {submitError && (
+                  <p className="mt-4 rounded-lg bg-brand-red-50 px-3 py-2 text-sm font-medium text-brand-red-700">
+                    {submitError}
+                  </p>
+                )}
+
+                <div className="mt-8 flex items-center justify-between">
+                  <Button type="button" variant="secondary" onClick={goBack} disabled={step === 1 || submitting}>
+                    Voltar
+                  </Button>
+                  <Button type="button" onClick={goNext} disabled={submitting}>
+                    {step === 6 ? (submitting ? "Enviando..." : "Enviar cadastro") : "Continuar"}
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </PublicLayout>
+      </div>
     </WizardContext.Provider>
   );
 }
