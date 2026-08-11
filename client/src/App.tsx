@@ -17,6 +17,7 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Wizard />} />
+          <Route path="/cadastro" element={<Wizard />} />
           <Route path="/cadastro/sucesso" element={<Success />} />
 
           <Route path="/admin/login" element={<Login />} />

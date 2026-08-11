@@ -28,28 +28,7 @@ if (isProduction) {
 
 app.use(errorHandler);
 
-import { PrismaClient } from "@prisma/client";
-import { hashPassword } from "./services/auth.service.js";
-
 const port = Number(process.env.PORT) || 3333;
-app.listen(port, async () => {
+app.listen(port, () => {
   console.log(`API MART Atacadista rodando em http://localhost:${port}`);
-  
-  try {
-    const prisma = new PrismaClient();
-    const adminEmail = "mart@atacadista.com.br";
-    const existing = await prisma.adminUser.findUnique({ where: { email: adminEmail } });
-    if (!existing) {
-      await prisma.adminUser.create({
-        data: {
-          email: adminEmail,
-          name: "Administrador MART",
-          passwordHash: await hashPassword("mart2020")
-        }
-      });
-      console.log("Admin account 'mart@atacadista.com.br' created successfully.");
-    }
-  } catch (err) {
-    console.error("Error creating default admin:", err);
-  }
 });
