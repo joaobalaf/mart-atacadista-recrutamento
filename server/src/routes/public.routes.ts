@@ -1,5 +1,4 @@
 import { Router } from "express";
-import rateLimit from "express-rate-limit";
 import { prisma } from "../db/prisma.js";
 import { createCandidateSchema } from "../validation/candidate.schema.js";
 import { geocodeAddress } from "../services/geocoding.service.js";
@@ -7,15 +6,6 @@ import { haversineDistanceKm } from "../services/distance.service.js";
 import { findPossibleDuplicate } from "../services/duplicate.service.js";
 
 export const publicRouter = Router();
-
-const candidateSubmitLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  limit: 8,
-  standardHeaders: true,
-  legacyHeaders: false,
-  validate: { xForwardedForHeader: false },
-  message: { error: "Muitas tentativas de cadastro. Tente novamente mais tarde." },
-});
 
 publicRouter.get("/jobs", async (_req, res, next) => {
   try {
@@ -41,7 +31,7 @@ publicRouter.get("/stores", async (_req, res, next) => {
   }
 });
 
-publicRouter.post("/candidates", candidateSubmitLimiter, async (req, res, next) => {
+publicRouter.post("/candidates", async (req, res, next) => {
   try {
     const input = createCandidateSchema.parse(req.body);
 
