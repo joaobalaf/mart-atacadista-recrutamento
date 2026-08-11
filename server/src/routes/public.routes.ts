@@ -13,6 +13,7 @@ const candidateSubmitLimiter = rateLimit({
   limit: 8,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: { error: "Muitas tentativas de cadastro. Tente novamente mais tarde." },
 });
 
