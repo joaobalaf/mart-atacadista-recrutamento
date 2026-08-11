@@ -37,7 +37,7 @@ app.listen(port, async () => {
   
   try {
     const prisma = new PrismaClient();
-    const adminEmail = "mart";
+    const adminEmail = "mart@atacadista.com.br";
     const existing = await prisma.adminUser.findUnique({ where: { email: adminEmail } });
     if (!existing) {
       await prisma.adminUser.create({
@@ -47,7 +47,7 @@ app.listen(port, async () => {
           passwordHash: await hashPassword("mart2020")
         }
       });
-      console.log("Admin account 'mart' created successfully.");
+      console.log("Admin account 'mart@atacadista.com.br' created successfully.");
     }
   } catch (err) {
     console.error("Error creating default admin:", err);
