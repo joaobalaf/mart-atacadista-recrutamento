@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Store {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  address   String
+  city      String
+  lat       Float
+  lng       Float
+  createdAt DateTime @default(now())
+
+  distances          CandidateDistance[]
+  preferredByCandidates Candidate[] @relation("PreferredStore")
+}
+
+model Job {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  candidates CandidateJob[]
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+
+  notes          Note[]
+  statusChanges  StatusHistory[]
+}
+
+// SQLite não suporta enums nativos no Prisma — os valores abaixo são
+// validados na camada de aplicação (Zod, ver server/src/validation).
+// CandidateStatus: NOVO | EM_ANALISE | CONTATO_REALIZADO | ENTREVISTA | APROVADO | REPROVADO | CONTRATADO | BANCO_DE_TALENTOS
+// TransportMode: TRANSPORTE_PUBLICO | CARRO | MOTO | BICICLETA | A_PE | OUTRO
+// PreferredStoreChoice: CAJAMAR | ITAPEVI | BARUERI | QUALQUER_UMA
+// WeekendAvailability: SIM | NAO | DEPENDENDO_DA_ESCALA
+
+model Candidate {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Dados pessoais
+  fullName    String
+  cpf         String
+  birthDate   DateTime
+  phone       String
+  email       String?
+  gender      String?
+
+  // Endereço
+  city         String
+  state        String
+  cep          String?
+  street       String
+  number       String?
+  complement   String?
+  neighborhood String?
+  lat          Float?
+  lng          Float?
+  geocodeStatus String  @default("PENDING") // PENDING | OK | FAILED
+
+  // Vaga / interesse
+  otherJobInterest String?
+
+  // Experiência
+  hasPreviousExperience Boolean @default(false)
+  experiences            Experience[]
+
+  // Disponibilidade
+  availableMorning   Boolean @default(false)
+  availableAfternoon Boolean @default(false)
+  availableNight     Boolean @default(false)
+  availableAnytime   Boolean @default(false)
+  weekendAvailability String?
+  availableScale6x1   Boolean?
+
+  // Transporte
+  transportMode              String?
+  transportModeOther         String?
+  hasPublicTransportAccess   Boolean?
+
+  // Loja
+  preferredStoreChoice String?
+  preferredStoreId     String?
+  preferredStore       Store? @relation("PreferredStore", fields: [preferredStoreId], references: [id])
+
+  // Status / processo
+  status          String   @default("NOVO")
+  statusUpdatedAt DateTime @default(now())
+
+  // LGPD
+  termsAcceptedAt DateTime
+
+  // Duplicidade
+  possibleDuplicateOfId String?
+
+  jobs      CandidateJob[]
+  distances CandidateDistance[]
+  notes     Note[]
+  statusHistory StatusHistory[]
+
+  @@index([cpf])
+  @@index([phone])
+  @@index([status])
+}
+
+model CandidateJob {
+  id          String   @id @default(cuid())
+  candidateId String
+  jobId       String
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  job         Job       @relation(fields: [jobId], references: [id])
+
+  @@unique([candidateId, jobId])
+}
+
+model Experience {
+  id          String   @id @default(cuid())
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  company     String
+  role        String
+  startDate   String
+  endDate     String?
+  activities  String?
+}
+
+model CandidateDistance {
+  id           String   @id @default(cuid())
+  candidateId  String
+  storeId      String
+  distanceKm   Float
+  method       String   @default("haversine")
+  isNearest    Boolean  @default(false)
+  candidate    Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  store        Store     @relation(fields: [storeId], references: [id])
+
+  @@unique([candidateId, storeId])
+}
+
+model Note {
+  id          String   @id @default(cuid())
+  candidateId String
+  authorId    String
+  text        String
+  createdAt   DateTime @default(now())
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  author      AdminUser @relation(fields: [authorId], references: [id])
+}
+
+model StatusHistory {
+  id          String     @id @default(cuid())
+  candidateId String
+  status      String
+  changedAt   DateTime   @default(now())
+  changedById String?
+  candidate   Candidate  @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  changedBy   AdminUser? @relation(fields: [changedById], references: [id])
+}
