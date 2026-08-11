@@ -1,19 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ProgressBar } from "../../components/ProgressBar";
 import { WizardSidePanel } from "../../components/WizardSidePanel";
 import { Logo } from "../../components/Logo";
 import { Button } from "../../components/ui";
-import { WizardContext, loadWizardState, saveWizardState, clearWizardState } from "../../store/wizardStore";
+import { WizardContext, loadFormState, saveFormState, clearFormState } from "../../store/wizardStore";
 import { emptyCandidateForm, type CandidateFormData } from "../../lib/types";
-import {
-  validateStep1,
-  validateStep2,
-  validateStep3,
-  validateStep4,
-  validateStep5,
-  type Errors,
-} from "../../lib/validation";
+import { validateStep1, validateStep2, validateStep3, validateStep4, validateStep5 } from "../../lib/validation";
 import { Step1PersonalData } from "./steps/Step1PersonalData";
 import { Step2Address } from "./steps/Step2Address";
 import { Step3Jobs } from "./steps/Step3Jobs";
@@ -22,13 +14,10 @@ import { Step5About } from "./steps/Step5About";
 import { api, ApiError } from "../../services/api";
 
 const VALIDATORS = [validateStep1, validateStep2, validateStep3, validateStep4, validateStep5];
-const TOTAL_STEPS = VALIDATORS.length;
 
 export function Wizard() {
-  const persisted = loadWizardState();
-  const [data, setData] = useState<CandidateFormData>(persisted?.data ?? emptyCandidateForm);
-  const [step, setStepState] = useState(persisted?.step ?? 1);
-  const [errors, setErrors] = useState<Errors>({});
+  const [data, setData] = useState<CandidateFormData>(loadFormState() ?? emptyCandidateForm);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -36,38 +25,20 @@ export function Wizard() {
   function updateData(patch: Partial<CandidateFormData>) {
     setData((prev) => {
       const next = { ...prev, ...patch };
-      saveWizardState(step, next);
+      saveFormState(next);
       return next;
     });
   }
 
-  function setStep(next: number) {
-    setStepState(next);
-    saveWizardState(next, data);
-  }
+  async function handleSubmit() {
+    const allErrors = VALIDATORS.reduce((acc, validate) => ({ ...acc, ...validate(data) }), {});
+    setErrors(allErrors);
 
-  function goNext() {
-    const validate = VALIDATORS[step - 1];
-    const stepErrors = validate(data);
-    setErrors(stepErrors);
-    if (Object.keys(stepErrors).length > 0) return;
-
-    if (step < TOTAL_STEPS) {
-      setStep(step + 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      submit();
+    if (Object.keys(allErrors).length > 0) {
+      document.getElementById("cadastro-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
     }
-  }
 
-  function goBack() {
-    if (step > 1) {
-      setStep(step - 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }
-
-  async function submit() {
     setSubmitting(true);
     setSubmitError(null);
     try {
@@ -85,7 +56,7 @@ export function Wizard() {
         aboutYou: data.aboutYou || undefined,
         termsAccepted: data.termsAccepted,
       });
-      clearWizardState();
+      clearFormState();
       navigate("/cadastro/sucesso");
     } catch (err) {
       setSubmitError(err instanceof ApiError ? err.message : "Não foi possível enviar seu cadastro. Tente novamente.");
@@ -95,47 +66,56 @@ export function Wizard() {
   }
 
   return (
-    <WizardContext.Provider value={{ data, updateData, step, setStep }}>
-      <div className="grid min-h-screen bg-brand-gray-50 lg:grid-cols-[400px_1fr]">
-        <WizardSidePanel step={step} />
+    <WizardContext.Provider value={{ data, updateData }}>
+      <div className="grid min-h-screen bg-slate-50/50 lg:grid-cols-[420px_1fr]">
+        <WizardSidePanel />
 
         <div className="flex flex-col">
-          <div className="border-b border-brand-gray-200 bg-white px-4 py-4 sm:px-6 lg:hidden">
-            <Link to="/">
-              <Logo variant="dark" />
+          <div className="border-b border-slate-100 bg-white/90 backdrop-blur-md px-6 py-4 lg:hidden sticky top-0 z-30">
+            <Link to="/" className="inline-block">
+              <Logo size="md" />
             </Link>
           </div>
 
-          <div className="flex flex-1 items-start justify-center px-4 py-8 sm:px-6 sm:py-12">
-            <div className="w-full max-w-xl">
-              <div className="mb-8 lg:hidden">
-                <ProgressBar step={step} />
+          <div className="flex flex-1 items-start justify-center px-4 py-8 sm:px-8 sm:py-14">
+            <div className="w-full max-w-2xl">
+              <div className="mb-8 hidden sm:block">
+                <span className="text-xs font-bold uppercase tracking-wider text-brand-gold-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200/60">
+                  Formulário de Inscrição
+                </span>
+                <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-900">
+                  Cadastre seu Currículo
+                </h1>
+                <p className="mt-1 text-sm text-slate-500">
+                  Preencha as informações abaixo para concorrer às vagas das nossas unidades.
+                </p>
               </div>
 
               <div
-                key={step}
-                className="animate-step-in rounded-2xl border border-brand-gray-200 bg-white p-6 shadow-sm sm:p-8"
+                id="cadastro-form"
+                className="space-y-8 rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-10 shadow-xl shadow-slate-200/40 relative overflow-hidden"
               >
-                {step === 1 && <Step1PersonalData errors={errors} />}
-                {step === 2 && <Step2Address errors={errors} />}
-                {step === 3 && <Step3Jobs errors={errors} />}
-                {step === 4 && <Step4Experience errors={errors} />}
-                {step === 5 && <Step5About errors={errors} />}
+                <div className="absolute top-0 left-0 h-1.5 w-full bg-gradient-to-r from-brand-red-600 via-brand-red-500 to-brand-gold-500" />
+
+                <Step1PersonalData errors={errors} />
+                <hr className="border-slate-100" />
+                <Step2Address errors={errors} />
+                <hr className="border-slate-100" />
+                <Step3Jobs errors={errors} />
+                <hr className="border-slate-100" />
+                <Step4Experience errors={errors} />
+                <hr className="border-slate-100" />
+                <Step5About errors={errors} />
 
                 {submitError && (
-                  <p className="mt-4 rounded-lg bg-brand-red-50 px-3 py-2 text-sm font-medium text-brand-red-700">
-                    {submitError}
+                  <p className="rounded-2xl bg-red-50 p-4 text-sm font-semibold text-brand-red-600 border border-red-100 shadow-xs">
+                    ⚠️ {submitError}
                   </p>
                 )}
 
-                <div className="mt-8 flex items-center justify-between">
-                  <Button type="button" variant="secondary" onClick={goBack} disabled={step === 1 || submitting}>
-                    Voltar
-                  </Button>
-                  <Button type="button" onClick={goNext} disabled={submitting}>
-                    {step === TOTAL_STEPS ? (submitting ? "Enviando..." : "Concluir") : "Continuar"}
-                  </Button>
-                </div>
+                <Button type="button" size="lg" className="w-full shadow-md shadow-brand-red-600/15" onClick={handleSubmit} disabled={submitting}>
+                  {submitting ? "Enviando seus dados..." : "Finalizar e Enviar Cadastro →"}
+                </Button>
               </div>
             </div>
           </div>

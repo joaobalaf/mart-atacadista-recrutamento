@@ -1,9 +1,9 @@
 import { createContext, useContext } from "react";
 import type { CandidateFormData } from "../lib/types";
 
-const STORAGE_KEY = "mart_cadastro_wizard";
+const STORAGE_KEY = "mart_cadastro_form";
 
-export function loadWizardState(): { step: number; data: CandidateFormData } | null {
+export function loadFormState(): CandidateFormData | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
@@ -13,19 +13,17 @@ export function loadWizardState(): { step: number; data: CandidateFormData } | n
   }
 }
 
-export function saveWizardState(step: number, data: CandidateFormData) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ step, data }));
+export function saveFormState(data: CandidateFormData) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-export function clearWizardState() {
+export function clearFormState() {
   localStorage.removeItem(STORAGE_KEY);
 }
 
 interface WizardContextValue {
   data: CandidateFormData;
   updateData: (patch: Partial<CandidateFormData>) => void;
-  step: number;
-  setStep: (step: number) => void;
 }
 
 export const WizardContext = createContext<WizardContextValue | null>(null);

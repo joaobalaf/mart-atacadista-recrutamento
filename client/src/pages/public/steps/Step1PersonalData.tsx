@@ -8,8 +8,7 @@ export function Step1PersonalData({ errors }: { errors: Errors }) {
 
   return (
     <div className="space-y-5">
-      <h2 className="text-lg font-bold text-brand-ink">Vamos começar</h2>
-      <p className="text-sm text-brand-gray-500">É rápido — leva só um minuto.</p>
+      <h2 className="text-lg font-bold text-brand-ink">Seus dados</h2>
 
       <div>
         <Label>Nome completo *</Label>

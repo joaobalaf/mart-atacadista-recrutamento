@@ -14,7 +14,6 @@ export function Step4Experience({ errors }: { errors: Errors }) {
         <Label>Qual foi sua última experiência de trabalho? *</Label>
         <Textarea
           rows={6}
-          autoFocus
           value={data.lastExperience}
           onChange={(e) => updateData({ lastExperience: e.target.value })}
           placeholder="Ex: Trabalhei como operador de caixa em um supermercado por 2 anos, cuidando do atendimento ao cliente..."

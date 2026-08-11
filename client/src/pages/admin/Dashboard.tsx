@@ -19,32 +19,45 @@ export function Dashboard() {
 
   return (
     <AdminLayout>
-      <h1 className="text-2xl font-black text-brand-ink">Dashboard</h1>
-      <p className="mt-1 text-sm text-brand-gray-500">Visão geral do banco de talentos MART Atacadista.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-slate-200/80">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Dashboard de Recrutamento</h1>
+          <p className="mt-1 text-xs sm:text-sm text-slate-500">
+            Visão geral e métricas em tempo real do banco de talentos MART Atacadista.
+          </p>
+        </div>
+        <div className="mt-3 sm:mt-0 inline-flex items-center gap-2 rounded-xl bg-white border border-slate-200/80 px-3.5 py-1.5 text-xs font-semibold text-slate-700 shadow-xs">
+          <span className="h-2 w-2 rounded-full bg-emerald-500" />
+          Sistema Ativo
+        </div>
+      </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
-        <Card>
-          <p className="text-xs font-semibold uppercase text-brand-gray-500">Total de candidatos</p>
-          <p className="mt-2 text-3xl font-black text-brand-ink">{stats?.total ?? "—"}</p>
+      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <Card className="relative overflow-hidden border-slate-200/80 shadow-xs hover:shadow-md transition">
+          <div className="absolute top-0 right-0 h-1 w-full bg-slate-300" />
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Total de Candidatos</p>
+          <p className="mt-3 text-4xl font-black text-slate-900">{stats?.total ?? "—"}</p>
         </Card>
-        <Card>
-          <p className="text-xs font-semibold uppercase text-brand-gray-500">Cadastros hoje</p>
-          <p className="mt-2 text-3xl font-black text-brand-red-600">{stats?.today ?? "—"}</p>
+        <Card className="relative overflow-hidden border-red-100 bg-gradient-to-br from-white via-white to-red-50/30 shadow-xs hover:shadow-md transition">
+          <div className="absolute top-0 right-0 h-1 w-full bg-brand-red-600" />
+          <p className="text-xs font-bold uppercase tracking-wider text-brand-red-600">Cadastros Hoje</p>
+          <p className="mt-3 text-4xl font-black text-brand-red-600">{stats?.today ?? "—"}</p>
         </Card>
-        <Card>
-          <p className="text-xs font-semibold uppercase text-brand-gray-500">Banco de talentos</p>
-          <p className="mt-2 text-3xl font-black text-brand-ink">
+        <Card className="relative overflow-hidden border-amber-100 bg-gradient-to-br from-white via-white to-amber-50/30 shadow-xs hover:shadow-md transition">
+          <div className="absolute top-0 right-0 h-1 w-full bg-brand-gold-500" />
+          <p className="text-xs font-bold uppercase tracking-wider text-brand-gold-600">Banco de Talentos</p>
+          <p className="mt-3 text-4xl font-black text-slate-900">
             {stats?.byStatus.BANCO_DE_TALENTOS ?? 0}
           </p>
         </Card>
       </div>
 
-      <h2 className="mt-8 text-sm font-bold uppercase tracking-wide text-brand-gray-500">Candidatos por status</h2>
-      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <h2 className="mt-10 text-xs font-extrabold uppercase tracking-wider text-slate-400">Status dos Processos Seletivos</h2>
+      <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {(Object.keys(STATUS_LABELS) as CandidateStatus[]).map((status) => (
-          <Card key={status} className="p-4">
-            <p className="text-xs text-brand-gray-500">{STATUS_LABELS[status]}</p>
-            <p className="mt-1 text-xl font-bold text-brand-ink">{stats?.byStatus[status] ?? 0}</p>
+          <Card key={status} className="p-5 border-slate-200/80 hover:border-brand-red-200 transition shadow-xs">
+            <p className="text-xs font-semibold text-slate-500">{STATUS_LABELS[status]}</p>
+            <p className="mt-2 text-2xl font-extrabold text-slate-900">{stats?.byStatus[status] ?? 0}</p>
           </Card>
         ))}
       </div>

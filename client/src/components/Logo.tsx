@@ -1,21 +1,23 @@
 interface LogoProps {
   variant?: "light" | "dark";
   className?: string;
+  size?: "sm" | "md" | "lg";
 }
 
-export function Logo({ variant = "light", className = "" }: LogoProps) {
-  const textColor = variant === "light" ? "text-white" : "text-brand-ink";
+export function Logo({ className = "", size = "md" }: LogoProps) {
+  const heightClass = {
+    sm: "h-8",
+    md: "h-11",
+    lg: "h-16",
+  }[size];
+
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-gold-500 text-sm font-black text-brand-ink">
-        M
-      </div>
-      <div className={`leading-none ${textColor}`}>
-        <div className="text-lg font-black tracking-tight">MART</div>
-        <div className="text-[10px] font-semibold tracking-[0.25em] text-brand-gold-500">
-          ATACADISTA
-        </div>
-      </div>
+    <div className={`inline-flex items-center ${className}`}>
+      <img
+        src="/mart-logo.png"
+        alt="MART Atacadista"
+        className={`${heightClass} w-auto object-contain drop-shadow-sm`}
+      />
     </div>
   );
 }

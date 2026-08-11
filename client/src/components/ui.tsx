@@ -46,20 +46,27 @@ export function ErrorText({ children }: { children?: string }) {
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "ghost";
+  size?: "sm" | "md" | "lg";
 }
 
-export function Button({ variant = "primary", className = "", ...rest }: ButtonProps) {
+export function Button({ variant = "primary", size = "md", className = "", ...rest }: ButtonProps) {
   const styles = {
     primary:
-      "bg-brand-red-600 text-white hover:bg-brand-red-700 shadow-sm shadow-brand-red-600/20 disabled:bg-brand-gray-300",
+      "bg-brand-red-600 text-white hover:bg-brand-red-700 active:bg-brand-red-800 shadow-sm shadow-brand-red-600/20 disabled:bg-brand-gray-300",
     secondary:
-      "bg-white text-brand-ink border border-brand-gray-300 hover:bg-brand-gray-50",
+      "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 shadow-xs",
     ghost: "text-brand-red-600 hover:bg-brand-red-50",
   }[variant];
 
+  const sizeStyles = {
+    sm: "px-3.5 py-1.5 text-xs font-medium rounded-lg",
+    md: "px-5 py-2.5 text-sm font-semibold rounded-xl",
+    lg: "px-7 py-3.5 text-base font-semibold rounded-xl",
+  }[size];
+
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${styles} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 ${sizeStyles} ${styles} ${className}`}
       {...rest}
     />
   );

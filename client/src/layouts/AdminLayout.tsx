@@ -14,22 +14,22 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const { admin, logout } = useAuth();
 
   return (
-    <div className="flex min-h-screen bg-brand-gray-50">
-      <aside className="flex w-64 shrink-0 flex-col bg-brand-ink text-white">
-        <div className="border-b border-white/10 px-5 py-5">
-          <Logo />
+    <div className="flex min-h-screen bg-slate-50/60">
+      <aside className="flex w-64 shrink-0 flex-col border-r border-slate-200/80 bg-white text-slate-800 shadow-xs">
+        <div className="border-b border-slate-100 px-6 py-5">
+          <Logo size="md" />
         </div>
-        <nav className="flex-1 space-y-1 px-3 py-4">
+        <nav className="flex-1 space-y-1.5 px-3 py-6">
           {NAV_ITEMS.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `block rounded-lg px-3 py-2.5 text-sm font-medium transition ${
+                `flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-all duration-200 ${
                   isActive
-                    ? "bg-brand-red-600 text-white"
-                    : "text-brand-gray-300 hover:bg-white/5 hover:text-white"
+                    ? "bg-red-50 text-brand-red-600 border border-red-100 shadow-xs"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                 }`
               }
             >
@@ -37,19 +37,26 @@ export function AdminLayout({ children }: { children: ReactNode }) {
             </NavLink>
           ))}
         </nav>
-        <div className="border-t border-white/10 px-5 py-4">
-          <p className="text-sm font-semibold">{admin?.name}</p>
-          <p className="truncate text-xs text-brand-gray-400">{admin?.email}</p>
+        <div className="border-t border-slate-100 px-5 py-4 bg-slate-50/50">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-red-600 text-sm font-bold text-white shadow-xs">
+              {admin?.name ? admin.name[0].toUpperCase() : "A"}
+            </div>
+            <div className="overflow-hidden">
+              <p className="truncate text-sm font-bold text-slate-900">{admin?.name}</p>
+              <p className="truncate text-xs text-slate-500">{admin?.email}</p>
+            </div>
+          </div>
           <button
             onClick={logout}
-            className="mt-3 w-full rounded-lg border border-white/15 px-3 py-1.5 text-xs font-semibold text-white/80 transition hover:bg-white/10"
+            className="mt-3 w-full rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 shadow-xs cursor-pointer"
           >
             Sair
           </button>
         </div>
       </aside>
       <div className="flex-1">
-        <main className="mx-auto max-w-7xl px-6 py-8">{children}</main>
+        <main className="mx-auto max-w-7xl px-8 py-8">{children}</main>
       </div>
     </div>
   );

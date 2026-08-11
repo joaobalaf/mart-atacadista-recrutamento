@@ -45,14 +45,16 @@ export function CandidateList() {
 
   return (
     <AdminLayout>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-slate-200/80">
         <div>
-          <h1 className="text-2xl font-black text-brand-ink">Candidatos</h1>
-          <p className="mt-1 text-sm text-brand-gray-500">{candidates.length} candidato(s) encontrado(s)</p>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Banco de Candidatos</h1>
+          <p className="mt-1 text-xs sm:text-sm text-slate-500">
+            {candidates.length} candidato(s) cadastrado(s) no sistema.
+          </p>
         </div>
       </div>
 
-      <Card className="mt-6">
+      <Card className="mt-6 border-slate-200/80 shadow-xs">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           <Input placeholder="Nome, telefone, cidade..." value={q} onChange={(e) => setQ(e.target.value)} className="lg:col-span-2" />
           <Select value={jobId} onChange={(e) => setJobId(e.target.value)}>

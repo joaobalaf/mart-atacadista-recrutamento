@@ -17,7 +17,6 @@ export function Step5About({ errors }: { errors: Errors }) {
         <Label>Sobre você *</Label>
         <Textarea
           rows={6}
-          autoFocus
           value={data.aboutYou}
           onChange={(e) => updateData({ aboutYou: e.target.value })}
           placeholder="Ex: Sou uma pessoa comunicativa, gosto de trabalhar em equipe e meu objetivo é crescer dentro da empresa..."
