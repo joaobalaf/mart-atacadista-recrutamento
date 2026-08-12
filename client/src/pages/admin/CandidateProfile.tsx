@@ -171,6 +171,7 @@ export function CandidateProfile() {
           <CardTitle>Distância das lojas</CardTitle>
           <p className="mb-3 text-xs text-brand-gray-500">
             Distância estimada em linha reta (Haversine) a partir do endereço informado.
+            {candidate.geocodeStatus === "APPROX" && " Endereço exato não encontrado — usamos o centro da cidade (menos preciso)."}
           </p>
           <div className="space-y-2">
             {sortedDistances.map((d) => (
@@ -184,7 +185,7 @@ export function CandidateProfile() {
                   {d.isNearest && "⭐ "}
                   {d.store.name.replace("MART Atacadista — ", "")}
                 </span>
-                <span>{d.distanceKm.toFixed(1)} km</span>
+                <span>{candidate.geocodeStatus === "APPROX" && "~"}{d.distanceKm.toFixed(1)} km</span>
               </div>
             ))}
             {sortedDistances.length === 0 && (

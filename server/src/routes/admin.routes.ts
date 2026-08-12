@@ -234,7 +234,7 @@ adminRouter.get("/stats", async (_req, res, next) => {
         where: { isNearest: true },
         _count: true,
       }),
-      prisma.candidate.count({ where: { geocodeStatus: { not: "OK" } } }),
+      prisma.candidate.count({ where: { geocodeStatus: "FAILED" } }),
     ]);
 
     const byStoreCounts = new Map(byStoreRaw.map((s) => [s.storeId, s._count]));

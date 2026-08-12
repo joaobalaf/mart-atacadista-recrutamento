@@ -99,9 +99,9 @@ export function CandidateList() {
 
   const jobOptions = useMemo(() => jobs, [jobs]);
   const visibleCandidates = onlyMissingLocation
-    ? candidates.filter((c) => c.geocodeStatus !== "OK")
+    ? candidates.filter((c) => c.geocodeStatus === "FAILED")
     : candidates;
-  const missingCount = candidates.filter((c) => c.geocodeStatus !== "OK").length;
+  const missingCount = candidates.filter((c) => c.geocodeStatus === "FAILED").length;
 
   return (
     <AdminLayout>
@@ -230,7 +230,7 @@ export function CandidateList() {
                 <td className="px-4 py-3 text-slate-600">{c.jobs.join(", ") || "—"}</td>
                 <td className="px-4 py-3">
                   {c.nearestStore ? (
-                    <StoreBadge name={c.nearestStore.name} distanceKm={c.nearestStore.distanceKm} />
+                    <StoreBadge name={c.nearestStore.name} distanceKm={c.nearestStore.distanceKm} approx={c.geocodeStatus === "APPROX"} />
                   ) : (
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 ring-1 ring-inset ring-amber-200">
