@@ -13,7 +13,7 @@ export function WizardSidePanel() {
       <div className="absolute bottom-0 left-0 -ml-16 -mb-16 h-80 w-80 rounded-full bg-amber-100/40 blur-3xl pointer-events-none" />
 
       <div className="relative">
-        <Logo size="lg" />
+        <Logo size="lg" boxed />
         <h1 className="mt-10 text-3xl font-black leading-tight text-slate-900">
           Sua próxima oportunidade profissional está a alguns passos.
         </h1>

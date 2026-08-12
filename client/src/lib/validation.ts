@@ -12,9 +12,12 @@ export function validateStep1(data: CandidateFormData): Errors {
 
 export function validateStep2(data: CandidateFormData): Errors {
   const errors: Errors = {};
-  if (!data.city.trim()) errors.city = "Informe a cidade.";
-  if (!data.state.trim()) errors.state = "Informe o estado.";
+  const cepDigits = data.cep.replace(/\D/g, "");
+  if (cepDigits.length !== 8) errors.cep = "Informe um CEP válido.";
+  if (!data.number.trim()) errors.number = "Informe o número da casa.";
   if (!data.street.trim()) errors.street = "Informe o endereço.";
+  if (!data.city.trim()) errors.city = "Informe a cidade.";
+  if (!data.state.trim()) errors.state = "Selecione o estado.";
   return errors;
 }
 

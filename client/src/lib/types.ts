@@ -82,4 +82,5 @@ export interface CandidateListItem {
   status: CandidateStatus;
   createdAt: string;
   possibleDuplicateOfId: string | null;
+  geocodeStatus: string;
 }

@@ -33,12 +33,16 @@ export function Login() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-red-50/40 via-white to-amber-50/30 px-4">
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 h-96 w-96 rounded-full bg-red-100/40 blur-3xl pointer-events-none" />
-      <div className="w-full max-w-md rounded-3xl border border-slate-200/80 bg-white p-8 sm:p-10 shadow-xl shadow-slate-200/50 relative z-10">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 px-4">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_60%)]" />
+      <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-brand-red-600/20 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-brand-gold-500/10 blur-3xl pointer-events-none" />
+
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white p-8 sm:p-10 shadow-2xl relative z-10">
         <div className="mb-6 flex justify-center">
           <Logo size="lg" />
         </div>
+
         <h1 className="text-center text-xl font-extrabold text-slate-900">Painel Administrativo</h1>
         <p className="mb-6 text-center text-xs text-slate-500">Acesso exclusivo para a equipe de recrutamento</p>
 
@@ -52,7 +56,7 @@ export function Login() {
             <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="••••••••" />
           </div>
           {error && <p className="text-sm font-semibold text-brand-red-600 bg-red-50 p-3 rounded-xl border border-red-100">{error}</p>}
-          <Button type="submit" size="lg" className="w-full mt-2 shadow-md shadow-brand-red-600/15" disabled={loading}>
+          <Button type="submit" variant="dark" size="lg" className="w-full mt-2" disabled={loading}>
             {loading ? "Entrando..." : "Acessar Painel"}
           </Button>
         </form>

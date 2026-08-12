@@ -1,8 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../db/prisma.js";
 import { createCandidateSchema } from "../validation/candidate.schema.js";
-import { geocodeAddress } from "../services/geocoding.service.js";
-import { haversineDistanceKm } from "../services/distance.service.js";
+import { geocodeAndSaveDistances } from "../services/candidateLocation.service.js";
 import { findPossibleDuplicate } from "../services/duplicate.service.js";
 
 export const publicRouter = Router();
@@ -37,13 +36,6 @@ publicRouter.post("/candidates", async (req, res, next) => {
 
     const duplicate = await findPossibleDuplicate(input.phone);
 
-    const geocode = await geocodeAddress({
-      street: `${input.street}${input.number ? ", " + input.number : ""}`,
-      city: input.city,
-      state: input.state,
-      cep: input.cep,
-    });
-
     const candidate = await prisma.candidate.create({
       data: {
         fullName: input.fullName,
@@ -53,9 +45,7 @@ publicRouter.post("/candidates", async (req, res, next) => {
         cep: input.cep,
         street: input.street,
         number: input.number,
-        lat: geocode?.lat ?? null,
-        lng: geocode?.lng ?? null,
-        geocodeStatus: geocode ? "OK" : "FAILED",
+        geocodeStatus: "PENDING",
         otherJobInterest: input.otherJobInterest,
         lastExperience: input.lastExperience,
         aboutYou: input.aboutYou,
@@ -70,23 +60,13 @@ publicRouter.post("/candidates", async (req, res, next) => {
       },
     });
 
-    if (geocode) {
-      const stores = await prisma.store.findMany();
-      const distances = stores.map((store) => ({
-        storeId: store.id,
-        distanceKm: haversineDistanceKm(geocode, { lat: store.lat, lng: store.lng }),
-      }));
-      const nearest = distances.reduce((min, d) => (d.distanceKm < min.distanceKm ? d : min), distances[0]);
-
-      await prisma.candidateDistance.createMany({
-        data: distances.map((d) => ({
-          candidateId: candidate.id,
-          storeId: d.storeId,
-          distanceKm: d.distanceKm,
-          isNearest: d.storeId === nearest.storeId,
-        })),
-      });
-    }
+    await geocodeAndSaveDistances(candidate.id, {
+      street: input.street,
+      number: input.number,
+      city: input.city,
+      state: input.state,
+      cep: input.cep,
+    });
 
     res.status(201).json({
       id: candidate.id,

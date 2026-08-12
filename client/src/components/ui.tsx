@@ -21,7 +21,7 @@ export function Label({ children, className = "", ...rest }: LabelHTMLAttributes
 }
 
 const fieldBase =
-  "w-full rounded-xl border border-brand-gray-300 bg-white px-3.5 py-2.5 text-sm text-brand-ink placeholder:text-brand-gray-400 outline-none transition focus:border-brand-red-500 focus:ring-2 focus:ring-brand-red-100";
+  "w-full rounded-xl border border-brand-gray-300 bg-white px-3.5 py-2.5 text-base sm:text-sm text-brand-ink placeholder:text-brand-gray-400 outline-none transition focus:border-brand-red-500 focus:ring-2 focus:ring-brand-red-100";
 
 export function Input({ className = "", ...rest }: InputHTMLAttributes<HTMLInputElement>) {
   return <input className={`${fieldBase} ${className}`} {...rest} />;
@@ -45,7 +45,7 @@ export function ErrorText({ children }: { children?: string }) {
 }
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "dark";
   size?: "sm" | "md" | "lg";
 }
 
@@ -56,6 +56,7 @@ export function Button({ variant = "primary", size = "md", className = "", ...re
     secondary:
       "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 shadow-xs",
     ghost: "text-brand-red-600 hover:bg-brand-red-50",
+    dark: "bg-slate-900 text-white hover:bg-slate-800 active:bg-slate-950 shadow-sm disabled:bg-slate-300",
   }[variant];
 
   const sizeStyles = {
